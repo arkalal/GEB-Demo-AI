@@ -20,6 +20,48 @@ const functions = [
       required: ["query"],
     },
   },
+  {
+    name: "update_registration",
+    description: "",
+    parameters: {
+      type: "object",
+      properties: {
+        query: {
+          type: "string",
+          description: "Update registration",
+        },
+      },
+      required: ["query"],
+    },
+  },
+  {
+    name: "pre_qualify_company",
+    description: "",
+    parameters: {
+      type: "object",
+      properties: {
+        query: {
+          type: "string",
+          description: "Apply to prequalify your company",
+        },
+      },
+      required: ["query"],
+    },
+  },
+  {
+    name: "registered_pre_qualify",
+    description: "",
+    parameters: {
+      type: "object",
+      properties: {
+        query: {
+          type: "string",
+          description: "Yes, I am registered for pre qualify",
+        },
+      },
+      required: ["query"],
+    },
+  },
 ];
 
 export async function POST(req) {
@@ -39,7 +81,7 @@ export async function POST(req) {
 
     const response = await openAi.chat.completions.create({
       messages: messages,
-      model: "gpt-4-0613",
+      model: "gpt-3.5-turbo",
       temperature: 0.9,
       max_tokens: 1000,
       functions: functions,

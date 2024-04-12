@@ -35,6 +35,14 @@ const NormalChatbot = () => {
     scrollToBottom();
   }, [chatHistory, isAITyping]);
 
+  useEffect(() => {
+    const initialMessage = {
+      response:
+        "Are you registered as a supplier? Remember that only registration is required to be visible in GEB and its Affiliates.\n\n1. Yes.\n2. No.\n3. I am not sure.",
+    };
+    setChatHistory([initialMessage]);
+  }, []);
+
   const startSpeechRecognition = async (e) => {
     recognition.current = new window.webkitSpeechRecognition();
     recognition.current.onresult = (event) => {
@@ -47,84 +55,161 @@ const NormalChatbot = () => {
 
   const handleSubmit = async (e, transcript) => {
     e.preventDefault();
-    const userMessage = {
-      role: "user",
-      content: transcript ? transcript : Prompt,
-    };
 
-    const updatedHistory = [...conversationHistory, userMessage];
-    setConversationHistory(updatedHistory);
-
-    const mesId = uuidv4();
-
-    // Update chat history with user prompt immediately
-    let newChatHistory = [
-      ...chatHistory,
-      {
-        prompt: transcript ? transcript : Prompt,
-        response: "",
-      },
-    ];
-    setChatHistory(newChatHistory);
-    setIsAITyping(true);
-
-    try {
-      const chatsData = {
-        prompt: transcript ? transcript : Prompt,
-        conversationHistory: conversationHistory,
+    if (Prompt || transcript) {
+      const userMessage = {
+        role: "user",
+        content: transcript ? transcript : Prompt,
       };
 
-      const res = await axios.post("chats", chatsData);
-      const data = res.data;
-      console.log(data);
-      // Check for function_call in the response
-      if (data?.function_call) {
-        console.log("function calling");
-        const functionCall = data.function_call;
+      const updatedHistory = [...conversationHistory, userMessage];
+      setConversationHistory(updatedHistory);
 
-        console.log("functionCall", functionCall);
+      const mesId = uuidv4();
 
-        if (functionCall.name === "get_Yes") {
-          // Assuming the function call is to send an email
-          try {
-            const functionArguments = JSON.parse(functionCall.arguments);
-            // const { query } = functionArguments;
-
-            // Update the chat history with the success message
-            newChatHistory = newChatHistory.map((chat, index) =>
-              index === newChatHistory.length - 1
-                ? {
-                    ...chat,
-                    response: `Are you registered in http://localhost:3000/ associated category?\n1. Yes, I am registered.\n2. No, I am not registered.\n3. I am not sure.`,
-                  }
-                : chat
-            );
-          } catch (error) {
-            console.error(error);
-
-            newChatHistory = newChatHistory.map((chat, index) =>
-              index === newChatHistory.length - 1
-                ? {
-                    ...chat,
-                    response: `Please try again`,
-                  }
-                : chat
-            );
-          }
-        }
-      } else {
-        // Update chat history with AI response
-        newChatHistory[newChatHistory.length - 1].response = data.content;
-      }
-
+      // Update chat history with user prompt immediately
+      let newChatHistory = [
+        ...chatHistory,
+        {
+          prompt: transcript ? transcript : Prompt,
+          response: "",
+        },
+      ];
       setChatHistory(newChatHistory);
-      setIsAITyping(false); // AI stops 'typing'
-    } catch (error) {
-      console.error(error);
-      setIsAITyping(false); // In case of an error, AI stops 'typing'
-    }
+      setIsAITyping(true);
+      setPrompt("");
 
-    setPrompt(""); // Clear the input after submitting
+      try {
+        const chatsData = {
+          prompt: transcript ? transcript : Prompt,
+          conversationHistory: conversationHistory,
+        };
+
+        const res = await axios.post("chats", chatsData);
+        const data = res.data;
+        console.log(data);
+        // Check for function_call in the response
+        if (data?.function_call) {
+          console.log("function calling");
+          const functionCall = data.function_call;
+
+          console.log("functionCall", functionCall);
+
+          if (functionCall.name === "get_Yes") {
+            // Assuming the function call is to send an email
+            try {
+              // Update the chat history with the success message
+              newChatHistory = newChatHistory.map((chat, index) =>
+                index === newChatHistory.length - 1
+                  ? {
+                      ...chat,
+                      response: `What would you like to do?\n1. Update registration.\n2. Apply to prequalify your company (In this option you can postulate the goods or services offered by your company to be preselected).\n3. Other inquiries.`,
+                    }
+                  : chat
+              );
+            } catch (error) {
+              console.error(error);
+
+              newChatHistory = newChatHistory.map((chat, index) =>
+                index === newChatHistory.length - 1
+                  ? {
+                      ...chat,
+                      response: `Please try again`,
+                    }
+                  : chat
+              );
+            }
+          }
+
+          if (functionCall.name === "update_registration") {
+            // Assuming the function call is to send an email
+            try {
+              // Update the chat history with the success message
+              newChatHistory = newChatHistory.map((chat, index) =>
+                index === newChatHistory.length - 1
+                  ? {
+                      ...chat,
+                      response: `To update your registration, you must log in to the vendor area by clicking on 'Access Proposals and Questions' on our GEB portal in the 'Registry of Providers' section.\n\nhttps://service.ariba.com/Supplier.aw/109534059/aw?awh=r&awssk=Q9NZuXEk&dard=1&ancdc=1`,
+                    }
+                  : chat
+              );
+            } catch (error) {
+              console.error(error);
+
+              newChatHistory = newChatHistory.map((chat, index) =>
+                index === newChatHistory.length - 1
+                  ? {
+                      ...chat,
+                      response: `Please try again`,
+                    }
+                  : chat
+              );
+            }
+          }
+
+          if (functionCall.name === "pre_qualify_company") {
+            // Assuming the function call is to send an email
+            try {
+              // Update the chat history with the success message
+              newChatHistory = newChatHistory.map((chat, index) =>
+                index === newChatHistory.length - 1
+                  ? {
+                      ...chat,
+                      response: `Consult the document of available categories for prequalification, validate the applicability, and confirm that you have the category in the registry.\n\nhttps://www.grupoenergiabogota.com/es/servicios/registro-de-proveedores\n🧾\n\n1. Yes, I am registered for pre qualify.\n2. No, I am not registered for pre qualify.\n3. I am not sure.`,
+                    }
+                  : chat
+              );
+            } catch (error) {
+              console.error(error);
+
+              newChatHistory = newChatHistory.map((chat, index) =>
+                index === newChatHistory.length - 1
+                  ? {
+                      ...chat,
+                      response: `Please try again`,
+                    }
+                  : chat
+              );
+            }
+          }
+
+          if (functionCall.name === "registered_pre_qualify") {
+            // Assuming the function call is to send an email
+            try {
+              // Update the chat history with the success message
+              newChatHistory = newChatHistory.map((chat, index) =>
+                index === newChatHistory.length - 1
+                  ? {
+                      ...chat,
+                      response: `Express your intention to prequalify in a category of goods or services by filling out the following form:\n\nhttps://forms.office.com/Pages/ResponsePage.aspx?id=MeSd1MKOJ0aV3KGwQburMIMfVQVpFRlNsCstqy_tRmBUMFRZRkxGMFcyNTNQV0tCUTlKQzlTWjcxUi4u`,
+                    }
+                  : chat
+              );
+            } catch (error) {
+              console.error(error);
+
+              newChatHistory = newChatHistory.map((chat, index) =>
+                index === newChatHistory.length - 1
+                  ? {
+                      ...chat,
+                      response: `Please try again`,
+                    }
+                  : chat
+              );
+            }
+          }
+        } else {
+          // Update chat history with AI response
+          newChatHistory[newChatHistory.length - 1].response = data.content;
+        }
+
+        setChatHistory(newChatHistory);
+        setIsAITyping(false); // AI stops 'typing'
+      } catch (error) {
+        console.error(error);
+        setIsAITyping(false); // In case of an error, AI stops 'typing'
+      }
+    }
   };
 
   return (
@@ -133,12 +218,17 @@ const NormalChatbot = () => {
         {chatHistory.map((chat, index) => {
           return (
             <div className={styles.chatQuery} key={index}>
-              <div className={styles.userText}>
-                <p>{chat.prompt}</p>
-              </div>
+              {chat.prompt && (
+                <div className={styles.userText}>
+                  <p>{chat.prompt}</p>
+                </div>
+              )}
 
               <div className={styles.aiText}>
-                <p>{chat.response || (isAITyping && "typing...")}</p>
+                <p>
+                  {(chat.response && chat.response) ||
+                    (isAITyping && "typing...")}
+                </p>
               </div>
             </div>
           );
