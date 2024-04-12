@@ -5,6 +5,23 @@ const openAi = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY,
 });
 
+const functions = [
+  {
+    name: "get_Yes",
+    description: "",
+    parameters: {
+      type: "object",
+      properties: {
+        query: {
+          type: "string",
+          description: "Yes",
+        },
+      },
+      required: ["query"],
+    },
+  },
+];
+
 export async function POST(req) {
   try {
     const { prompt, conversationHistory } = await req.json();
@@ -25,6 +42,8 @@ export async function POST(req) {
       model: "gpt-4-0613",
       temperature: 0.9,
       max_tokens: 1000,
+      functions: functions,
+      function_call: "auto",
     });
 
     return NextResponse.json(response.choices[0].message);

@@ -18,7 +18,7 @@ const NormalChatbot = () => {
 
   const systemMessage = {
     role: "system",
-    content: `You are an AI assistant. You may need to call functions to complete your tasks. You can only call functions if user has given you permission to do so. If you don't know the arguments to pass into function you MUST ASK TO THE USER. Dont call the function untill you get all the arguments from the user. If you feel any arguments is missing ask that to the user again, until you get all the arguments, and then call the function`,
+    content: `You are a chatbot for Supplier Management of Grupo Energía Bogotá and Affiliates and you answer to user's questions not more than 40 words (use emojis). Do not tell them about function calling, just do it in the background if required.`,
   };
 
   const [conversationHistory, setConversationHistory] = useState([
@@ -77,7 +77,45 @@ const NormalChatbot = () => {
       const res = await axios.post("chats", chatsData);
       const data = res.data;
       console.log(data);
-      newChatHistory[newChatHistory.length - 1].response = data.content;
+      // Check for function_call in the response
+      if (data?.function_call) {
+        console.log("function calling");
+        const functionCall = data.function_call;
+
+        console.log("functionCall", functionCall);
+
+        if (functionCall.name === "get_Yes") {
+          // Assuming the function call is to send an email
+          try {
+            const functionArguments = JSON.parse(functionCall.arguments);
+            // const { query } = functionArguments;
+
+            // Update the chat history with the success message
+            newChatHistory = newChatHistory.map((chat, index) =>
+              index === newChatHistory.length - 1
+                ? {
+                    ...chat,
+                    response: `Are you registered in http://localhost:3000/ associated category?\n1. Yes, I am registered.\n2. No, I am not registered.\n3. I am not sure.`,
+                  }
+                : chat
+            );
+          } catch (error) {
+            console.error(error);
+
+            newChatHistory = newChatHistory.map((chat, index) =>
+              index === newChatHistory.length - 1
+                ? {
+                    ...chat,
+                    response: `Please try again`,
+                  }
+                : chat
+            );
+          }
+        }
+      } else {
+        // Update chat history with AI response
+        newChatHistory[newChatHistory.length - 1].response = data.content;
+      }
 
       setChatHistory(newChatHistory);
       setIsAITyping(false); // AI stops 'typing'
