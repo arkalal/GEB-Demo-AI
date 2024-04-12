@@ -1,9 +1,10 @@
 import React from "react";
+import NormalChatbot from "../../components/NormalChatbot/NormalChatbot";
 
 const page = () => {
   return (
     <div>
-      <h2>GEB Demo 🚀</h2>
+      <NormalChatbot />
     </div>
   );
 };
