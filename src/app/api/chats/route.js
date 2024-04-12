@@ -21,6 +21,34 @@ const functions = [
     },
   },
   {
+    name: "get_No",
+    description: "",
+    parameters: {
+      type: "object",
+      properties: {
+        query: {
+          type: "string",
+          description: "No",
+        },
+      },
+      required: ["query"],
+    },
+  },
+  {
+    name: "get_Not_sure",
+    description: "",
+    parameters: {
+      type: "object",
+      properties: {
+        query: {
+          type: "string",
+          description: "I am not sure",
+        },
+      },
+      required: ["query"],
+    },
+  },
+  {
     name: "update_registration",
     description: "",
     parameters: {

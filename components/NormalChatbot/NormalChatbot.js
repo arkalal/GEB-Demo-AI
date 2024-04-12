@@ -103,7 +103,59 @@ const NormalChatbot = () => {
                 index === newChatHistory.length - 1
                   ? {
                       ...chat,
-                      response: `What would you like to do?\n1. Update registration.\n2. Apply to prequalify your company (In this option you can postulate the goods or services offered by your company to be preselected).\n3. Other inquiries.`,
+                      response: `What would you like to do?\n\n1. Update registration.\n\n2. Apply to prequalify your company (In this option you can postulate the goods or services offered by your company to be preselected).\n\n3. Other inquiries.`,
+                    }
+                  : chat
+              );
+            } catch (error) {
+              console.error(error);
+
+              newChatHistory = newChatHistory.map((chat, index) =>
+                index === newChatHistory.length - 1
+                  ? {
+                      ...chat,
+                      response: `Please try again`,
+                    }
+                  : chat
+              );
+            }
+          }
+
+          if (functionCall.name === "get_No") {
+            // Assuming the function call is to send an email
+            try {
+              // Update the chat history with the success message
+              newChatHistory = newChatHistory.map((chat, index) =>
+                index === newChatHistory.length - 1
+                  ? {
+                      ...chat,
+                      response: `Please continue with the registry. To be part of the GEB suppliers, please complete the registration through the following link:\n\nhttps://www.grupoenergiabogota.com/conoce-geb/proveedores-y-contratistas/registro-de-proveedores`,
+                    }
+                  : chat
+              );
+            } catch (error) {
+              console.error(error);
+
+              newChatHistory = newChatHistory.map((chat, index) =>
+                index === newChatHistory.length - 1
+                  ? {
+                      ...chat,
+                      response: `Please try again`,
+                    }
+                  : chat
+              );
+            }
+          }
+
+          if (functionCall.name === "get_Not_sure") {
+            // Assuming the function call is to send an email
+            try {
+              // Update the chat history with the success message
+              newChatHistory = newChatHistory.map((chat, index) =>
+                index === newChatHistory.length - 1
+                  ? {
+                      ...chat,
+                      response: `Please verify your registration. To verify if you are not registered as a supplier, please fill out the following form:\n\n`,
                     }
                   : chat
               );
